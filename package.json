@@ -1,0 +1,21 @@
+{
+  "name": "@objectwow/join",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "postinstall": "npm run build"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "22.5.5",
+    "typescript": "5.5.4"
+  },
+  "peerDependencies": {}
+}
