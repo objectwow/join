@@ -1,9 +1,8 @@
-import { Types, typeOf, isNullOrUndefined } from '../src/util';
+import { Types, typeOf, isNullOrUndefined, isEmptyObject } from "../src/util";
 
-describe('Util Functions', () => {
-
+describe("Util Functions", () => {
   // Tests for typeOf function
-  describe('typeOf function', () => {
+  describe("typeOf function", () => {
     it('should return "Object" for an object', () => {
       const obj = {};
       expect(typeOf(obj)).toBe(Types.Object);
@@ -20,7 +19,7 @@ describe('Util Functions', () => {
     });
 
     it('should return "String" for a string', () => {
-      const str = 'Hello';
+      const str = "Hello";
       expect(typeOf(str)).toBe(Types.String);
     });
 
@@ -56,33 +55,83 @@ describe('Util Functions', () => {
   });
 
   // Tests for isNullOrUndefined function
-  describe('isNullOrUndefined function', () => {
-    it('should return true for null', () => {
+  describe("isNullOrUndefined function", () => {
+    it("should return true for null", () => {
       expect(isNullOrUndefined(null)).toBe(true);
     });
 
-    it('should return true for undefined', () => {
+    it("should return true for undefined", () => {
       expect(isNullOrUndefined(undefined)).toBe(true);
     });
 
-    it('should return false for 0', () => {
+    it("should return false for 0", () => {
       expect(isNullOrUndefined(0)).toBe(false);
     });
 
-    it('should return false for an empty string', () => {
-      expect(isNullOrUndefined('')).toBe(false);
+    it("should return false for an empty string", () => {
+      expect(isNullOrUndefined("")).toBe(false);
     });
 
-    it('should return false for false', () => {
+    it("should return false for false", () => {
       expect(isNullOrUndefined(false)).toBe(false);
     });
 
-    it('should return false for an object', () => {
+    it("should return false for an object", () => {
       expect(isNullOrUndefined({})).toBe(false);
     });
 
-    it('should return false for an array', () => {
+    it("should return false for an array", () => {
       expect(isNullOrUndefined([])).toBe(false);
+    });
+  });
+
+  describe("isEmptyObject", () => {
+    it("should return true for undefined", () => {
+      expect(isEmptyObject(undefined)).toBe(true);
+    });
+
+    it("should return true for null", () => {
+      expect(isEmptyObject(null)).toBe(true);
+    });
+
+    it("should return true for an empty array", () => {
+      expect(isEmptyObject([])).toBe(true);
+    });
+
+    it("should return true for an empty object", () => {
+      expect(isEmptyObject({})).toBe(true);
+    });
+
+    it("should return false for a non-empty array", () => {
+      expect(isEmptyObject([1, 2, 3])).toBe(false);
+    });
+
+    it("should return false for a non-empty object", () => {
+      expect(isEmptyObject({ a: 1, b: 2 })).toBe(false);
+    });
+
+    it("should return false for an object with empty nested objects", () => {
+      expect(isEmptyObject({ a: {}, b: 2 })).toBe(false);
+    });
+
+    it("should return false for an array of empty objects", () => {
+      expect(isEmptyObject([{}, {}])).toBe(false);
+    });
+
+    it("should return false for a mixed array with both empty and non-empty objects", () => {
+      expect(isEmptyObject([{ a: 1 }, {}])).toBe(false);
+    });
+
+    it("should return false for a string (non-object, non-array)", () => {
+      expect(isEmptyObject("string")).toBe(false);
+    });
+
+    it("should return false for a number (non-object, non-array)", () => {
+      expect(isEmptyObject(123)).toBe(false);
+    });
+
+    it("should return false for a boolean (non-object, non-array)", () => {
+      expect(isEmptyObject(true)).toBe(false);
     });
   });
 });
