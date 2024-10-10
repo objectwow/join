@@ -1,5 +1,5 @@
 import { JoinData } from "./core";
-import { JoinDataParam, JoinDataResult } from "./type";
+import { GenerateAsValueParam, HandleLocalObjParam, JoinDataParam, JoinDataResult, LocalParam, Primitive } from "./type";
 
 export class SingletonJoinData {
   static instance: JoinData;

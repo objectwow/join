@@ -200,7 +200,7 @@ describe("JoinData - execute method full coverage", () => {
       { id: 1, items: [101, 102] },
       { id: 2, items: [201] },
     ];
-    const from = jest.fn().mockResolvedValue([
+    const from = () => ([
       { id: 101, product: "Product 101" },
       { id: 102, product: "Product 102" },
       { id: 201, product: "Product 201" },
@@ -212,7 +212,7 @@ describe("JoinData - execute method full coverage", () => {
       fromField: "id",
       from,
       as: "products",
-      asMap: { productName: "product" },
+      asMap: undefined,
     });
 
     expect(local).toEqual([
@@ -220,14 +220,14 @@ describe("JoinData - execute method full coverage", () => {
         id: 1,
         items: [101, 102],
         products: [
-          { productName: "Product 101" },
-          { productName: "Product 102" },
+          { id: 101, product: "Product 101" },
+          { id: 102, product: "Product 102" },
         ],
       },
       {
         id: 2,
         items: [201],
-        products: [{ productName: "Product 201" }],
+        products: [{ id: 201, product: "Product 201" }],
       },
     ]);
     expect(result.allSuccess).toBe(true);
@@ -284,7 +284,7 @@ describe("JoinData - execute method full coverage", () => {
       fromField: "id",
       from,
       as: "products",
-      asMap: { productName: "product" },
+      asMap: { id: "id", productName: "product" },
     });
 
     expect(local).toEqual([
@@ -292,16 +292,16 @@ describe("JoinData - execute method full coverage", () => {
         id: 1,
         items: [101, 102],
         products: [
-          { productName: "Product 101" },
-          { productName: "Product 102" },
+          { id: 101, productName: "Product 101" },
+          { id: 102, productName: "Product 102" },
         ],
       },
       {
         id: 2,
         items: [101, 201],
         products: [
-          { productName: "Product 101" },
-          { productName: "Product 201" },
+          { id: 101, productName: "Product 101" },
+          { id: 201, productName: "Product 201" },
         ],
       },
     ]);
