@@ -60,6 +60,8 @@ result = {
 };
 ```
 
+Note: see more samples in the `test`
+
 ```typescript
 export interface JoinDataParam {
   /**
@@ -68,18 +70,17 @@ export interface JoinDataParam {
   local: LocalParam;
 
   /**
-   * A callback function that returns the data from the source.
+   * A callback (async) function that returns the data from the source. Data is object or an array of objects
    */
-  from: async (...args: any[]) => Promise<any>;
   from: (...args: any[]) => any;
 
   /**
-   * The field name in the local object(s) used for the join (source field).
+   * The field name in the local object(s) used for the join (source field), can be a nested field, separated by a dot ('.')
    */
   localField: string;
 
   /**
-   * The field name in the from object used for the join (destination field).
+   * The field name in the from object used for the join (destination field), can be a nested field, separated by a dot ('.')
    */
   fromField: string;
 
