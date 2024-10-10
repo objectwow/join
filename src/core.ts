@@ -1,18 +1,33 @@
 import { DOT } from "./constant";
-import { AsMap, JoinDataParam, LocalParam, Primitive } from "./type";
-import { isNullOrUndefined, typeOf, Types, validateFields } from "./util";
+import {
+  AsMap,
+  GenerateAsValueParam,
+  HandleLocalObjParam,
+  JoinDataParam,
+  JoinDataResult,
+  LocalParam,
+  Primitive,
+} from "./type";
+import { isNullOrUndefined, typeOf, Types } from "./util";
 
 export class JoinData {
-  private parseFieldPath(fieldPath: string) {
-    const [first, ...remain] = fieldPath.split(DOT);
+  protected validateFields(arr: { key: string; value: any }[]) {
+    for (const item of arr) {
+      if (!item.value) {
+        throw new Error(`Missing ${item.key} value`);
+      }
+    }
+  }
 
+  protected parseFieldPath(fieldPath: string) {
+    const [first, ...remain] = fieldPath.split(DOT);
     return {
       path: first,
       newPath: remain?.join("."),
     };
   }
 
-  private getFieldValue(parent: object, path: string) {
+  protected getFieldValue(parent: object, path: string) {
     if (typeOf(parent) !== Types.Object) {
       return undefined;
     }
@@ -25,14 +40,15 @@ export class JoinData {
     return this.getFieldValue(parent[parsePath.path], parsePath.newPath);
   }
 
-  protected formatLocalParam(local: LocalParam) {
+  protected standardizeLocalParam(local: LocalParam) {
     return local;
   }
 
-  protected generateJoinResult(
+  protected generateResult(
     joinFailedValues: Primitive[],
-    localOverwrite: LocalParam
-  ) {
+    localOverwrite: LocalParam,
+    metadata?: any
+  ): JoinDataResult {
     const allSuccess = !joinFailedValues.length;
     return {
       joinFailedValues: Array.from(new Set(joinFailedValues)),
@@ -40,51 +56,43 @@ export class JoinData {
     };
   }
 
-  protected generateAsValue(
-    localValue: Primitive,
-    fromFieldMap: Map<any, object>,
-    asMap: AsMap,
-    joinFailedValues: Primitive[]
-  ) {
+  protected generateAsValue(param: GenerateAsValueParam) {
+    const { localValue, fromFieldMap, asMap, joinFailedValues, metadata } =
+      param;
     const fromValue = fromFieldMap.get(localValue);
     if (fromValue === undefined) {
       joinFailedValues.push(localValue);
       return undefined;
     }
 
-    let result: any = {}
+    let result: any = {};
     if (asMap) {
       Object.keys(asMap).forEach((key: string) => {
-        const fromFieldValue = this.getFieldValue(fromValue, asMap[key])
+        const fromFieldValue = this.getFieldValue(fromValue, asMap[key]);
         if (fromFieldValue !== undefined) {
-          result[key] = fromFieldValue
+          result[key] = fromFieldValue;
         }
-      })
+      });
     } else {
-      result = fromValue
+      result = fromValue;
     }
 
-    return result
+    return result;
   }
 
-  protected handleLocalObj(
-    local: object,
-    localField: string,
-    from: object | object[],
-    fromField: string,
-    as: string,
-    asMap: AsMap,
-    joinFailedValues: Primitive[]
-  ) {
-    if (!from) {
-      return;
-    }
-
+  protected handleLocalObj(param: HandleLocalObjParam) {
+    const {
+      local,
+      localField,
+      from,
+      fromField,
+      as,
+      asMap,
+      joinFailedValues,
+      metadata,
+    } = param;
+    // standardize from parameter
     const fromArr = typeOf(from) === Types.Array ? (from as object[]) : [from];
-
-    const fromFieldMap = new Map(
-      fromArr.map((obj) => [this.getFieldValue(obj, fromField), obj])
-    );
 
     const localValue = this.getFieldValue(local, localField);
 
@@ -92,63 +100,106 @@ export class JoinData {
       return;
     }
 
+    // optimize find: O(1) at next step
+    const fromFieldMap = new Map(
+      fromArr.map((obj) => [this.getFieldValue(obj, fromField), obj])
+    );
+
     if (typeOf(localValue) === Types.Array) {
       if (!as) {
-        throw new Error("Not found rootArrayAs when local value is array and as is object")
+        throw new Error(
+          "Not found rootArrayAs when local value is array and as is object"
+        );
       }
 
-      local[as] = []
+      local[as] = [];
 
       localValue.forEach((value: Primitive) => {
-        const asValue = this.generateAsValue(value, fromFieldMap, asMap, joinFailedValues)
+        const asValue = this.generateAsValue({
+          localValue: value,
+          fromFieldMap,
+          asMap,
+          joinFailedValues,
+          metadata,
+        });
+
         if (!asValue) {
-          return
+          return;
         }
 
         local[as].push(asValue);
-
       });
-      return
+      return;
     }
 
     // Not array
-    const asValue = this.generateAsValue(localValue, fromFieldMap, asMap, joinFailedValues)
+    const asValue = this.generateAsValue({
+      localValue,
+      fromFieldMap,
+      asMap,
+      joinFailedValues,
+      metadata,
+    });
     if (!asValue) {
-      return
+      return;
     }
 
     if (as) {
-      local[as] = asValue
-      return
+      local[as] = asValue;
+      return;
     }
 
-    Object.assign(local, asValue)
+    // as not defined
+    Object.assign(local, asValue);
   }
 
-
   public async execute<FromFn extends (...args: any[]) => any>(
-    param: JoinDataParam<FromFn>
-  ) {
+    param: JoinDataParam<FromFn>,
+    metadata?: any
+  ): Promise<JoinDataResult> {
     const { from, localField, fromField, as, asMap } = param;
     let { local } = param;
     const joinFailedValues: Primitive[] = [];
 
-    validateFields([{ key: "local", value: local }, { key: "from", value: from }, { key: "localField", value: localField }, { key: "fromField", value: fromField }])
+    this.validateFields([
+      { key: "local", value: local },
+      { key: "from", value: from },
+      { key: "localField", value: localField },
+      { key: "fromField", value: fromField },
+    ]);
 
-    local = this.formatLocalParam(local);
+    local = this.standardizeLocalParam(local);
 
     const result: any[] = await from();
 
     if (typeOf(local) === Types.Array) {
       (local as object[]).forEach((v) => {
-        this.handleLocalObj(v, localField, result, fromField, as, asMap, joinFailedValues);
+        this.handleLocalObj({
+          local: v,
+          localField,
+          from: result,
+          fromField,
+          as,
+          asMap,
+          joinFailedValues,
+          metadata,
+        });
       });
 
-      return this.generateJoinResult(joinFailedValues, local)
+      return this.generateResult(joinFailedValues, local, metadata);
     }
 
-    this.handleLocalObj(local, localField, result, fromField, as, asMap, joinFailedValues);
+    this.handleLocalObj({
+      local,
+      localField,
+      from: result,
+      fromField,
+      as,
+      asMap,
+      joinFailedValues,
+      metadata,
+    });
 
-    return this.generateJoinResult(joinFailedValues, local)
+    return this.generateResult(joinFailedValues, local, metadata);
   }
 }

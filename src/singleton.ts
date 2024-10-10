@@ -1,26 +1,29 @@
-import { JoinData } from "./core"
-import { JoinDataParam } from "./type"
+import { JoinData } from "./core";
+import { JoinDataParam, JoinDataResult } from "./type";
 
 export class SingletonJoinData {
-	static instance: JoinData
+  static instance: JoinData;
 
-	private constructor() { }
+  private constructor() {}
 
-	static getInstance() {
-		if (SingletonJoinData.instance) {
-			return SingletonJoinData.instance
-		}
+  static getInstance() {
+    if (SingletonJoinData.instance) {
+      return SingletonJoinData.instance;
+    }
 
-		SingletonJoinData.instance = new JoinData()
-		return SingletonJoinData.instance
-	}
+    SingletonJoinData.instance = new JoinData();
+    return SingletonJoinData.instance;
+  }
 
-	static setInstance(instance: JoinData){
-		SingletonJoinData.instance = instance
-		return SingletonJoinData.instance
-	}
+  static setInstance(instance: JoinData) {
+    SingletonJoinData.instance = instance;
+    return SingletonJoinData.instance;
+  }
 }
 
-export async function joinData<FromFn extends (...args: any[]) => any>(params: JoinDataParam<FromFn>) {
-	return SingletonJoinData.getInstance().execute(params)
+export async function joinData<FromFn extends (...args: any[]) => any>(
+  params: JoinDataParam<FromFn>,
+  metadata?: any
+): Promise<JoinDataResult> {
+  return SingletonJoinData.getInstance().execute(params, metadata);
 }

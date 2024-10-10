@@ -3,19 +3,53 @@
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
+  "description": "Queue and Event Bus with Rabbit MQ",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/objectwow/join.git"
+  },
+  "homepage": "https://github.com/objectwow/join#readme",
+  "keywords": [
+    "object",
+    "join"
+  ],
+  "author": "Nguyen Van Tuan",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "postinstall": "npm run build"
+    "prepublish": "npm run build",
+    "test": "jest",
+    "test:cov": "jest --coverage"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@types/node": "22.5.5",
-    "typescript": "5.5.4"
+    "@types/jest": "^29.5.13",
+    "@types/node": "22.7.5",
+    "jest": "29.7.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "5.6.3"
   },
-  "peerDependencies": {}
+  "jest": {
+    "verbose": true,
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "moduleNameMapper": {},
+    "rootDir": ".",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "./src/**/*.(t|j)s",
+      "!**/index.ts"
+    ],
+    "coverageDirectory": "./coverage",
+    "testEnvironment": "node"
+  }
 }

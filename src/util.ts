@@ -17,11 +17,3 @@ export const typeOf = (value: any): Types =>
 export function isNullOrUndefined(value: any) {
   return value === null || value === undefined;
 }
-
-export function validateFields(arr: { key: string, value: any }[]) {
-  for (const item of arr) {
-    if (!item.value) {
-      throw new Error(`Missing ${item.key} value`)
-    }
-  }
-}
