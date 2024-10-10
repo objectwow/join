@@ -21,8 +21,8 @@ export class SingletonJoinData {
   }
 }
 
-export async function joinData<FromFn extends (...args: any[]) => any>(
-  params: JoinDataParam<FromFn>,
+export async function joinData(
+  params: JoinDataParam,
   metadata?: any
 ): Promise<JoinDataResult> {
   return SingletonJoinData.getInstance().execute(params, metadata);

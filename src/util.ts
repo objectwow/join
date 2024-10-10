@@ -17,3 +17,10 @@ export const typeOf = (value: any): Types =>
 export function isNullOrUndefined(value: any) {
   return value === null || value === undefined;
 }
+
+export function isEmptyObject(obj: any | any[]) {
+  if (!obj) return true;
+  if (typeOf(obj) === Types.Array && !obj?.length) return true;
+  if (typeOf(obj) === Types.Object && !Object.values(obj)?.length) return true;
+  return false;
+}

@@ -8,7 +8,7 @@ import {
   LocalParam,
   Primitive,
 } from "./type";
-import { isNullOrUndefined, typeOf, Types } from "./util";
+import { isEmptyObject, isNullOrUndefined, typeOf, Types } from "./util";
 
 export class JoinData {
   protected validateFields(arr: { key: string; value: any }[]) {
@@ -153,8 +153,8 @@ export class JoinData {
     Object.assign(local, asValue);
   }
 
-  public async execute<FromFn extends (...args: any[]) => any>(
-    param: JoinDataParam<FromFn>,
+  public async execute(
+    param: JoinDataParam,
     metadata?: any
   ): Promise<JoinDataResult> {
     const { from, localField, fromField, as, asMap } = param;
@@ -169,8 +169,14 @@ export class JoinData {
     ]);
 
     local = this.standardizeLocalParam(local);
+    if (isEmptyObject(local)) {
+      return this.generateResult(joinFailedValues, local, metadata);
+    }
 
     const result: any[] = await from();
+    if (isEmptyObject(result)) {
+      return this.generateResult(joinFailedValues, local, metadata);
+    }
 
     if (typeOf(local) === Types.Array) {
       (local as object[]).forEach((v) => {

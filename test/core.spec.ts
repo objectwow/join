@@ -225,7 +225,7 @@ describe('JoinData - execute method full coverage', () => {
 
   it('should merge entire `from` object when `as` and `asMap` are undefined', async () => {
     const fromFn = jest.fn().mockResolvedValue([{ id: 1, name: 'Alice', age: 25 }]);
-    const param: JoinDataParam<any> = {
+    const param: JoinDataParam = {
       from: fromFn,
       local: { id: 1 },
       localField: 'id',
@@ -246,7 +246,7 @@ describe('JoinData - execute method full coverage', () => {
 
   it('should handle case when no matching field found and `as`/`asMap` are undefined', async () => {
     const fromFn = jest.fn().mockResolvedValue([{ id: 1, name: 'Alice', age: 25 }]);
-    const param: JoinDataParam<any> = {
+    const param: JoinDataParam = {
       from: fromFn,
       local: { id: 2 },
       localField: 'id',
@@ -270,7 +270,7 @@ describe('JoinData - execute method full coverage', () => {
       { id: 1, name: 'Alice', age: 25 },
       { id: 2, name: 'Bob', age: 30 },
     ]);
-    const param: JoinDataParam<any> = {
+    const param: JoinDataParam = {
       from: fromFn,
       local: [{ id: 1 }, { id: 2 }],
       localField: 'id',
@@ -294,7 +294,7 @@ describe('JoinData - execute method full coverage', () => {
 
   it('should return failed result when `localField` is incorrect', async () => {
     const fromFn = jest.fn().mockResolvedValue([{ id: 1, name: 'Alice' }]);
-    const param: JoinDataParam<any> = {
+    const param: JoinDataParam = {
       from: fromFn,
       local: { wrongLocalField: 1 }, // Wrong `localField`
       localField: 'id', // `localField` does not exist in `local`
@@ -316,7 +316,7 @@ describe('JoinData - execute method full coverage', () => {
 
   it('should return failed result when `fromField` is incorrect', async () => {
     const fromFn = jest.fn().mockResolvedValue([{ wrongId: 1, name: 'Alice' }]); // Wrong `fromField`
-    const param: JoinDataParam<any> = {
+    const param: JoinDataParam = {
       from: fromFn,
       local: { id: 1 },
       localField: 'id',

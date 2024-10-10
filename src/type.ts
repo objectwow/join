@@ -4,9 +4,9 @@ export type LocalParam = object | object[];
 
 export type AsMap = { [key: string]: string };
 
-export interface JoinDataParam<FromFn> {
+export interface JoinDataParam {
   local: LocalParam;
-  from: FromFn;
+  from: (...args: any[]) => any;
   localField: string;
   fromField: string;
   as?: string;
