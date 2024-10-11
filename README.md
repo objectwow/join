@@ -156,6 +156,8 @@ const joinCls = new YourJoin()
 await joinCls.execute({...})
 ```
 
+Tips: You can call original function (parent function) with `super.`
+
 ## Benchmark
 
 node lib/benchmark.js
