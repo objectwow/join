@@ -1,3 +1,6 @@
-test
-src
+tests
 coverage
+/src
+.vscode
+/benchmark.ts
+/index.ts

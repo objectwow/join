@@ -5,7 +5,7 @@ import { JoinDataParam, JoinDataResult } from "../src/type";
 describe("SingletonJoinData and joinData", () => {
   afterEach(() => {
     // Reset the Singleton instance after each test
-    SingletonJoinData.instance = undefined;
+    SingletonJoinData.setInstance(null as any);
   });
 
   describe("SingletonJoinData", () => {
