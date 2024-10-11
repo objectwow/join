@@ -122,7 +122,9 @@ export class YourJoin extends JoinData {
   protected handleLocalObj(param: HandleLocalObjParam): void {}
   protected parseFieldPath(fieldPath: string): { path: string; newPath: string; } {}
   // Use case: Shadow clone local data without overwriting the original.
-  protected standardizeLocalParam(local: LocalParam): LocalParam {}
+  protected standardizeLocalParam(local: LocalParam, metadata?: any): Promise<LocalParam> {}
+  // Use case: Auto call internal/external service to get data depends on input
+  protected standardizeFromParam(from: FromParam, metadata?: any): Promise<any[]> {}
   // Use case: Throw an error if the field is invalid
   protected validateFields(arr: { key: string; value: any; }[], metadata?: any): void {}
 }

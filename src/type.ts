@@ -2,6 +2,8 @@ export type Primitive = string | number | boolean;
 
 export type LocalParam = object | object[];
 
+export type FromParam = (...args: any[]) => any;
+
 export type AsMap = { [key: string]: string };
 
 export interface JoinDataParam {
@@ -51,7 +53,7 @@ export interface GenerateAsValueParam {
 export interface HandleLocalObjParam {
   local: object;
   localField: string;
-  from: object | object[];
+  fromArr: object[];
   fromField: string;
   as: string;
   asMap: AsMap;

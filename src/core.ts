@@ -1,5 +1,6 @@
 // import { DOT } from "./constant";
 import {
+  FromParam,
   GenerateAsValueParam,
   HandleLocalObjParam,
   JoinDataParam,
@@ -41,8 +42,22 @@ export class JoinData {
     return this.getFieldValue(parent[parsePath.path], parsePath.newPath);
   }
 
-  protected standardizeLocalParam(local: LocalParam) {
+  protected async standardizeLocalParam(
+    local: LocalParam,
+    metadata?: any
+  ): Promise<LocalParam> {
     return local;
+  }
+
+  protected async standardizeFromParam(
+    from: FromParam,
+    metadata?: any
+  ): Promise<any[]> {
+    const result = await from();
+    const fromArr =
+      typeOf(result) === Types.Array ? (result as object[]) : [result];
+
+    return fromArr;
   }
 
   protected generateResult(
@@ -85,16 +100,13 @@ export class JoinData {
     const {
       local,
       localField,
-      from,
+      fromArr,
       fromField,
       as,
       asMap,
       joinFailedValues,
       metadata,
     } = param;
-    // standardize from parameter
-    const fromArr = typeOf(from) === Types.Array ? (from as object[]) : [from];
-
     const localValue = this.getFieldValue(local, localField);
 
     if (isNullOrUndefined(localValue)) {
@@ -172,12 +184,12 @@ export class JoinData {
       metadata
     );
 
-    local = this.standardizeLocalParam(local);
+    local = await this.standardizeLocalParam(local, metadata);
     if (isEmptyObject(local)) {
       return this.generateResult(joinFailedValues, local, metadata);
     }
 
-    const result: any[] = await from();
+    const result: any[] = await this.standardizeFromParam(from, metadata);
     if (isEmptyObject(result)) {
       return this.generateResult(joinFailedValues, local, metadata);
     }
@@ -187,7 +199,7 @@ export class JoinData {
         this.handleLocalObj({
           local: v,
           localField,
-          from: result,
+          fromArr: result,
           fromField,
           as,
           asMap,
@@ -202,7 +214,7 @@ export class JoinData {
     this.handleLocalObj({
       local,
       localField,
-      from: result,
+      fromArr: result,
       fromField,
       as,
       asMap,
