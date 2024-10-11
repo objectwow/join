@@ -31,8 +31,8 @@ const from = () => [
 const result = await joinData({
   local,
   localField: "items",
-  fromField: "id",
   from,
+  fromField: "id",
   as: "products",
 });
 ```
@@ -62,7 +62,7 @@ result = {
 };
 ```
 
-Note: see more samples in the `test`
+Note: see more samples in the [`tests`](https://github.com/objectwow/join/blob/main/tests/core.spec.ts)
 
 ```typescript
 export interface JoinDataParam {
@@ -72,17 +72,20 @@ export interface JoinDataParam {
   local: LocalParam;
 
   /**
-   * A callback (async) function that returns the data from the source. Data is object or an array of objects
+   * A callback (async) function that returns the data from the source.
+   * Data is object or an array of objects
    */
   from: (...args: any[]) => any;
 
   /**
-   * The field name in the local object(s) used for the join, can be a nested field, separated by a dot ('.')
+   * The field name in the local object(s) used for the join,
+   * can be a nested field, separated by a dot ('.')
    */
   localField: string;
 
   /**
-   * The field name in the from object used for the join, can be a nested field, separated by a dot ('.')
+   * The field name in the from object used for the join,
+   * can be a nested field, separated by a dot ('.')
    */
   fromField: string;
 
@@ -114,31 +117,63 @@ With an out-of-the-box design, you can create your own function using the curren
 import { JoinData } from "@objectwow/join";
 
 export class YourJoin extends JoinData {
-  public execute(param: JoinDataParam, metadata?: any): Promise<JoinDataResult> {}
+  public execute(
+    param: JoinDataParam,
+    metadata?: any
+  ): Promise<JoinDataResult> {}
+
   // Use case: Currently, deep values are split by a dot ('.'), but you can use a different symbol if needed
   protected separateSymbol: string;
-  protected generateAsValue(param: GenerateAsValueParam) {}
-  // Use case: Return your custom output
-  protected generateResult(joinFailedValues: Primitive[], localOverwrite: LocalParam, metadata?: any) {}
-  protected getFieldValue(parent: object, path: string) {}
-  protected handleLocalObj(param: HandleLocalObjParam): void {}
-  protected parseFieldPath(fieldPath: string): { path: string; newPath: string; } {}
-  // Use case: Shadow clone local data without overwriting the original.
-  protected standardizeLocalParam(local: LocalParam, metadata?: any): Promise<LocalParam> {}
-  // Use case: Automatically call internal or external services to retrieve data based on the input
-  protected standardizeFromParam(from: FromParam, metadata?: any): Promise<any[]> {}
-  // Use case: Throw an error if the field is invalid
-  protected validateFields(arr: { key: string; value: any; }[], metadata?: any): void {}
-}
 
-// --- Using solution 1 ---
-// Override the default JoinData instance
+  protected generateAsValue(param: GenerateAsValueParam) {}
+
+  // Use case: Return your custom output
+  protected generateResult(
+    joinFailedValues: Primitive[],
+    localOverwrite: LocalParam,
+    metadata?: any
+  ) {}
+
+  protected getFieldValue(parent: object, path: string) {}
+
+  protected handleLocalObj(param: HandleLocalObjParam): void {}
+
+  protected parseFieldPath(fieldPath: string): {
+    path: string;
+    newPath: string;
+  } {}
+
+  // Use case: Shadow clone local data without overwriting the original.
+  protected standardizeLocalParam(
+    local: LocalParam,
+    metadata?: any
+  ): Promise<LocalParam> {}
+
+  // Use case: Automatically call internal or external services to retrieve data based on the input
+  protected standardizeFromParam(
+    from: FromParam,
+    metadata?: any
+  ): Promise<any[]> {}
+
+  // Use case: Throw an error if the field is invalid
+  protected validateFields(
+    arr: { key: string; value: any }[],
+    metadata?: any
+  ): void {}
+}
+```
+
+- Using solution 1: Override the default JoinData instance
+
+```typescript
 SingletonJoinData.setInstance(new YourJoin())
 
 await joinData({...})
+```
 
-// --- Using solution 2 ---
-// Or you can create new singleton instances as needed
+- Using solution 2: create new singleton instances as needed
+
+```typescript
 import { SingletonJoinData } from "@objectwow/join";
 
 export class YourSingletonJoinData extends SingletonJoinData{}
@@ -153,9 +188,11 @@ export async function yourJoinDataFunction(
 }
 
 await yourJoinDataFunction({...})
+```
 
-// --- Using solution 3 ---
-// Or, you can directly use your new class without a singleton instance.
+- Using solution 3: you can directly use your new class without a singleton instance.
+
+```typescript
 const joinCls = new YourJoin()
 await joinCls.execute({...})
 ```
