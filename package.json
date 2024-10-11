@@ -1,6 +1,6 @@
 {
   "name": "@objectwow/join",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "license": "MIT",
   "description": "Join object to object like Database join",
   "publishConfig": {
@@ -22,7 +22,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "prepublish": "npm run test && npm run build",
+    "prepublishOnly": "npm run test && npm run build",
     "test": "jest",
     "test:cov": "jest --coverage"
   },
