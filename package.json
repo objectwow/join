@@ -1,8 +1,8 @@
 {
   "name": "@objectwow/join",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "license": "MIT",
-  "description": "Join object to object like Database join",
+  "description": "Join object to object like MongoDB",
   "publishConfig": {
     "access": "public"
   },

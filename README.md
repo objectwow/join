@@ -1,6 +1,6 @@
 # @objectwow/join
 
-Join object to object like Database join
+Join object to object like MongoDB
 
 ## Use case
 

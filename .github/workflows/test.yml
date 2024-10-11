@@ -1,0 +1,30 @@
+name: Run Tests on Pull Request
+
+# Trigger the workflow on a pull request event
+on:
+  pull_request:
+    branches:
+      - main # or whatever branch you're targeting for PRs
+
+jobs:
+  test:
+    runs-on: ubuntu-latest # Specifies the environment where the action will run
+
+    steps:
+      # Step 1: Check out the code from the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js environment (specify your Node.js version)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22" # or the version you need
+
+      # Step 3: Install dependencies using npm
+      - name: Install dependencies
+        run: npm ci
+
+      # Step 4: Run tests
+      - name: Run tests
+        run: npm run test
