@@ -1,7 +1,6 @@
 {
   "name": "@objectwow/join",
   "version": "0.0.0",
-  "private": true,
   "license": "MIT",
   "description": "Queue and Event Bus with Rabbit MQ",
   "publishConfig": {
@@ -9,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/objectwow/join.git"
+    "url": "git+https://github.com/objectwow/join.git"
   },
   "homepage": "https://github.com/objectwow/join#readme",
   "keywords": [
