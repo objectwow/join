@@ -8,7 +8,9 @@ In a microservices system where each service owns its own database, querying dat
 
 ## Installation
 
+```
 npm i @objectwow/join
+```
 
 ## Basic usage
 
