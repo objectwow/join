@@ -1,6 +1,5 @@
-import { DOT } from "./constant";
+// import { DOT } from "./constant";
 import {
-  AsMap,
   GenerateAsValueParam,
   HandleLocalObjParam,
   JoinDataParam,
@@ -11,6 +10,8 @@ import {
 import { isEmptyObject, isNullOrUndefined, typeOf, Types } from "./util";
 
 export class JoinData {
+  protected separateSymbol: string = ".";
+
   protected validateFields(arr: { key: string; value: any }[]) {
     for (const item of arr) {
       if (!item.value) {
@@ -20,7 +21,7 @@ export class JoinData {
   }
 
   protected parseFieldPath(fieldPath: string) {
-    const [first, ...remain] = fieldPath.split(DOT);
+    const [first, ...remain] = fieldPath.split(this.separateSymbol);
     return {
       path: first,
       newPath: remain?.join("."),

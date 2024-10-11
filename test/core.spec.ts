@@ -200,6 +200,7 @@ describe("JoinData - execute method full coverage", () => {
       { id: 1, items: [101, 102] },
       { id: 2, items: [201] },
     ];
+    
     const from = () => ([
       { id: 101, product: "Product 101" },
       { id: 102, product: "Product 102" },

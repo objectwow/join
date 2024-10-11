@@ -75,12 +75,12 @@ export interface JoinDataParam {
   from: (...args: any[]) => any;
 
   /**
-   * The field name in the local object(s) used for the join (source field), can be a nested field, separated by a dot ('.')
+   * The field name in the local object(s) used for the join, can be a nested field, separated by a dot ('.')
    */
   localField: string;
 
   /**
-   * The field name in the from object used for the join (destination field), can be a nested field, separated by a dot ('.')
+   * The field name in the from object used for the join, can be a nested field, separated by a dot ('.')
    */
   fromField: string;
 
@@ -90,7 +90,7 @@ export interface JoinDataParam {
   as?: string;
 
   /**
-   * An optional mapping from the fromField values to the new field names in the local object(s).
+   * An optional mapping from the from object(s) values to the new field names in the local object(s).
    */
   asMap?: AsMap;
 }
@@ -109,14 +109,17 @@ export type JoinDataResult =
 With an out-of-the-box design, you can create your own function using the current structure.
 
 ```typescript
+import { JoinData } from "@objectwow/join";
+
 export class YourJoin extends JoinData {
   public execute(param: JoinDataParam, metadata?: any): Promise<JoinDataResult> {}
+  // Use case: Currently, deep values are split by a dot ('.'), but you can use a different symbol if needed
+  protected separateSymbol: string;
   protected generateAsValue(param: GenerateAsValueParam) {}
   // Use case: Return your custom output
   protected generateResult(joinFailedValues: Primitive[], localOverwrite: LocalParam, metadata?: any) {}
   protected getFieldValue(parent: object, path: string) {}
   protected handleLocalObj(param: HandleLocalObjParam): void {}
-  // Use case: Currently, deep values are split by a dot ('.'), but you can use a different symbol if needed
   protected parseFieldPath(fieldPath: string): { path: string; newPath: string; } {}
   // Use case: Shadow clone local data without overwriting the original.
   protected standardizeLocalParam(local: LocalParam): LocalParam {}
@@ -124,39 +127,30 @@ export class YourJoin extends JoinData {
   protected validateFields(arr: { key: string; value: any; }[]): void {}
 }
 
-// --- Usage solution 1 ---
+// --- Using solution 1 ---
 // Override the default JoinData instance
 SingletonJoinData.setInstance(new YourJoin())
 
 await joinData({...})
 
-// --- Usage solution 2 ---
+// --- Using solution 2 ---
 // Or you can create new singleton instances as needed
-export class SingletonJoinData {
-  static instance: JoinData;
+import { SingletonJoinData } from "@objectwow/join";
 
-  private constructor() {}
+export class YourSingletonJoinData extends SingletonJoinData{}
 
-  static getInstance() {
-    if (SingletonJoinData.instance) {
-      return SingletonJoinData.instance;
-    }
+YourSingletonJoinData.setInstance(new YourJoin())
 
-    SingletonJoinData.instance = new YourJoin();
-    return SingletonJoinData.instance;
-  }
-}
-
-export async function yourJoinData(
+export async function yourJoinDataFunction(
   params: JoinDataParam,
   metadata?: any
 ): Promise<JoinDataResult> {
-  return SingletonJoinData.getInstance().execute(params, metadata);
+  return YourSingletonJoinData.getInstance().execute(params, metadata);
 }
 
-await yourJoinData({...})
+await yourJoinDataFunction({...})
 
-// --- Usage solution 3 ---
+// --- Using solution 3 ---
 // Or, you can directly use your new class without a singleton instance.
 const joinCls = new YourJoin()
 await joinCls.execute({...})

@@ -22,6 +22,16 @@ describe("SingletonJoinData and joinData", () => {
 
       expect(SingletonJoinData.getInstance()).toBe(setInstance);
     });
+
+    it("should return the different instance when create new class extend SingletonJoinData", () => {
+      const instance1 = SingletonJoinData.getInstance();
+
+      class JoinData2 extends JoinData {}
+      class SingletonJoinData2 extends SingletonJoinData {}
+      const instance2 = SingletonJoinData2.setInstance(new JoinData2());
+
+      expect(instance1).not.toBe(instance2);
+    });
   });
 
   describe("joinData function", () => {

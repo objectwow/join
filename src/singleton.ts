@@ -4,7 +4,7 @@ import { GenerateAsValueParam, HandleLocalObjParam, JoinDataParam, JoinDataResul
 export class SingletonJoinData {
   static instance: JoinData;
 
-  private constructor() {}
+  protected constructor() {}
 
   static getInstance() {
     if (SingletonJoinData.instance) {
