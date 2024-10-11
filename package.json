@@ -1,8 +1,8 @@
 {
   "name": "@objectwow/join",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "license": "MIT",
-  "description": "Queue and Event Bus with Rabbit MQ",
+  "description": "Join object to object like Database join",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
