@@ -15,7 +15,7 @@ export interface JoinDataParam {
   /**
    * A callback function that returns the data from the source.
    */
-  from: (...args: any[]) => any;
+  from: FromParam;
 
   /**
    * The field name in the local object(s) used for the join (source field).
