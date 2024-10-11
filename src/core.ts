@@ -12,7 +12,7 @@ import { isEmptyObject, isNullOrUndefined, typeOf, Types } from "./util";
 export class JoinData {
   protected separateSymbol: string = ".";
 
-  protected validateFields(arr: { key: string; value: any }[]) {
+  protected validateFields(arr: { key: string; value: any }[], metadata?: any) {
     for (const item of arr) {
       if (!item.value) {
         throw new Error(`Missing ${item.key} value`);
@@ -162,12 +162,15 @@ export class JoinData {
     let { local } = param;
     const joinFailedValues: Primitive[] = [];
 
-    this.validateFields([
-      { key: "local", value: local },
-      { key: "from", value: from },
-      { key: "localField", value: localField },
-      { key: "fromField", value: fromField },
-    ]);
+    this.validateFields(
+      [
+        { key: "local", value: local },
+        { key: "from", value: from },
+        { key: "localField", value: localField },
+        { key: "fromField", value: fromField },
+      ],
+      metadata
+    );
 
     local = this.standardizeLocalParam(local);
     if (isEmptyObject(local)) {

@@ -124,7 +124,7 @@ export class YourJoin extends JoinData {
   // Use case: Shadow clone local data without overwriting the original.
   protected standardizeLocalParam(local: LocalParam): LocalParam {}
   // Use case: Throw an error if the field is invalid
-  protected validateFields(arr: { key: string; value: any; }[]): void {}
+  protected validateFields(arr: { key: string; value: any; }[], metadata?: any): void {}
 }
 
 // --- Using solution 1 ---
