@@ -20,5 +20,5 @@
     "moduleResolution": "node"
   },
   "include": ["."],
-  "exclude": ["lib", "node_modules", "tests"]
+  "exclude": ["lib", "node_modules", "tests", "test-by-cases"]
 }

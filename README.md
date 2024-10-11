@@ -62,7 +62,7 @@ result = {
 };
 ```
 
-Note: see more samples in the [`tests`](https://github.com/objectwow/join/blob/main/tests/core.spec.ts)
+Note: see more samples in the [`tests`](https://github.com/objectwow/join/blob/main/tests/core.spec.ts) and ['test-by-cases](https://github.com/objectwow/join/blob/main/test-by-cases)
 
 ```typescript
 export interface JoinDataParam {

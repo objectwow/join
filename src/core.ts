@@ -1,4 +1,3 @@
-// import { DOT } from "./constant";
 import {
   FromParam,
   GenerateAsValueParam,
@@ -29,17 +28,29 @@ export class JoinData {
     };
   }
 
-  protected getFieldValue(parent: object, path: string) {
-    if (typeOf(parent) !== Types.Object) {
-      return undefined;
+  private getFieldValue(parent: object | object[], path: string) {
+    if (typeOf(parent) === Types.Array) {
+      const arr = (parent as object[])
+        .map((v) => this.getFieldValue(v, path))
+        .flat(Infinity);
+
+      return Array.from(new Set(arr));
     }
 
-    const parsePath = this.parseFieldPath(path);
-    if (!parsePath.newPath) {
-      return parent[parsePath.path];
+    if (typeOf(parent) === Types.Object) {
+      if (!path) {
+        return parent;
+      }
+
+      const parsePath = this.parseFieldPath(path);
+      if (!parsePath.newPath) {
+        return parent[parsePath.path];
+      }
+
+      return this.getFieldValue(parent[parsePath.path], parsePath.newPath);
     }
 
-    return this.getFieldValue(parent[parsePath.path], parsePath.newPath);
+    return parent;
   }
 
   protected async standardizeLocalParam(
@@ -51,9 +62,18 @@ export class JoinData {
 
   protected async standardizeFromParam(
     from: FromParam,
+    localFieldValues: string[],
     metadata?: any
   ): Promise<any[]> {
-    const result = await from();
+    if (typeOf(from) === Types.Object) {
+      return [from];
+    }
+
+    if (typeOf(from) === Types.Array) {
+      return from as any[];
+    }
+
+    const result = await (from as Function)(localFieldValues, metadata);
     const fromArr =
       typeOf(result) === Types.Array ? (result as object[]) : [result];
 
@@ -72,35 +92,62 @@ export class JoinData {
     };
   }
 
-  protected generateAsValue(param: GenerateAsValueParam) {
-    const { localValue, fromFieldMap, asMap, joinFailedValues, metadata } =
+  private async generateAsValue(param: GenerateAsValueParam) {
+    const { localValue, fromFieldMap, asMap, joinFailedValues, as, metadata } =
       param;
+
     const fromValue = fromFieldMap.get(localValue);
     if (fromValue === undefined) {
-      joinFailedValues.push(localValue);
+      if (
+        typeOf(localValue) === Types.Array ||
+        typeOf(localValue) === Types.Object
+      ) {
+        // joinFailedValues.push(...localValue);
+        // skip
+      } else {
+        joinFailedValues.push(localValue);
+      }
+
       return undefined;
     }
 
     let result: any = {};
     if (asMap) {
-      Object.keys(asMap).forEach((key: string) => {
-        const fromFieldValue = this.getFieldValue(fromValue, asMap[key]);
+      if (typeOf(asMap) === Types.String) {
+        const fromFieldValue = this.getFieldValue(fromValue, asMap as string);
         if (fromFieldValue !== undefined) {
-          result[key] = fromFieldValue;
+          // overwrite type
+          result = fromFieldValue;
         }
-      });
+      } else if (typeOf(asMap) === Types.Object) {
+        Object.keys(asMap).forEach((key: string) => {
+          const fromFieldValue = this.getFieldValue(fromValue, asMap[key]);
+          if (fromFieldValue !== undefined) {
+            result[key] = fromFieldValue;
+          }
+        });
+      } else {
+        // function
+        result = await (asMap as Function)(fromValue, metadata);
+      }
     } else {
       result = fromValue;
+    }
+
+    if (as) {
+      return {
+        [as]: result,
+      };
     }
 
     return result;
   }
 
-  protected handleLocalObj(param: HandleLocalObjParam) {
+  private async handleLocalObj(param: HandleLocalObjParam) {
     const {
       local,
       localField,
-      fromArr,
+      fromFieldMap,
       fromField,
       as,
       asMap,
@@ -113,56 +160,103 @@ export class JoinData {
       return;
     }
 
-    // optimize find: O(1) at next step
-    const fromFieldMap = new Map(
-      fromArr.map((obj) => [this.getFieldValue(obj, fromField), obj])
-    );
-
     if (typeOf(localValue) === Types.Array) {
       if (!as) {
+        throw new Error("Not found as when local value is array");
+      }
+
+      const parseAsField = this.parseFieldPath(as);
+      if (typeOf(local[as]) === Types.Array) {
+        const parseLocalField = this.parseFieldPath(localField);
+
+        if (parseLocalField.path !== parseAsField.path) {
+          throw new Error(
+            `First path of localField and as not matching, ${parseLocalField.path} !== ${parseAsField.path}`
+          );
+        }
+
+        for (const item of local[as]) {
+          await this.handleLocalObj({
+            local: item,
+            localField: parseLocalField.newPath,
+            fromFieldMap,
+            fromField,
+            as: parseAsField.newPath,
+            asMap,
+            joinFailedValues,
+            metadata,
+          });
+        }
+
+        return;
+      }
+
+      if (typeOf[local[as]] === Types.Object) {
         throw new Error(
-          "Not found rootArrayAs when local value is array and as is object"
+          `Field ${as} existed but is object. It must be an array when local value is array`
         );
       }
 
-      local[as] = [];
-
-      localValue.forEach((value: Primitive) => {
-        const asValue = this.generateAsValue({
+      local[parseAsField.path] = [];
+      for (const value of localValue) {
+        const asValue = await this.generateAsValue({
           localValue: value,
           fromFieldMap,
+          as: parseAsField.newPath,
           asMap,
           joinFailedValues,
           metadata,
         });
 
         if (!asValue) {
-          return;
+          continue;
         }
 
-        local[as].push(asValue);
-      });
-      return;
+        local[parseAsField.path].push(asValue);
+      }
     }
 
     // Not array
-    const asValue = this.generateAsValue({
-      localValue,
-      fromFieldMap,
-      asMap,
-      joinFailedValues,
-      metadata,
-    });
-    if (!asValue) {
-      return;
-    }
-
     if (as) {
-      local[as] = asValue;
+      const parseAsField = this.parseFieldPath(as);
+      const asValue = await this.generateAsValue({
+        localValue,
+        fromFieldMap,
+        as: parseAsField.newPath,
+        asMap,
+        joinFailedValues,
+        metadata,
+      });
+
+      if (!asValue) {
+        return;
+      }
+
+      if (typeOf[local[parseAsField.path]] === Types.Array) {
+        throw new Error(
+          `Field ${as} existed but is array. It must be an object when local value is object`
+        );
+      }
+
+      if (typeOf[local[parseAsField.path]] === Types.Object) {
+        Object.assign(local[parseAsField.path], asValue);
+        return;
+      }
+
+      local[parseAsField.path] = asValue;
       return;
     }
 
     // as not defined
+    const asValue = await this.generateAsValue({
+      localValue,
+      fromFieldMap,
+      as: undefined,
+      asMap,
+      joinFailedValues,
+      metadata,
+    });
+
     Object.assign(local, asValue);
   }
 
@@ -185,36 +279,49 @@ export class JoinData {
     );
 
     local = await this.standardizeLocalParam(local, metadata);
+
     if (isEmptyObject(local)) {
       return this.generateResult(joinFailedValues, local, metadata);
     }
 
-    const result: any[] = await this.standardizeFromParam(from, metadata);
+    const localFieldValues = this.getFieldValue(local, localField);
+    const result: any[] = await this.standardizeFromParam(
+      from,
+      localFieldValues,
+      metadata
+    );
+
     if (isEmptyObject(result)) {
+      joinFailedValues.push(...localFieldValues);
       return this.generateResult(joinFailedValues, local, metadata);
     }
 
+    // optimize find: O(1) at next step
+    const fromFieldMap = new Map(
+      result.map((obj) => [this.getFieldValue(obj, fromField), obj])
+    );
+
     if (typeOf(local) === Types.Array) {
-      (local as object[]).forEach((v) => {
-        this.handleLocalObj({
-          local: v,
+      for (const item of local as object[]) {
+        await this.handleLocalObj({
+          local: item,
           localField,
-          fromArr: result,
+          fromFieldMap,
           fromField,
           as,
           asMap,
           joinFailedValues,
           metadata,
         });
-      });
+      }
 
       return this.generateResult(joinFailedValues, local, metadata);
     }
 
-    this.handleLocalObj({
+    await this.handleLocalObj({
       local,
       localField,
-      fromArr: result,
+      fromFieldMap,
       fromField,
       as,
       asMap,

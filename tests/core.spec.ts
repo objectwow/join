@@ -199,4 +199,141 @@ describe("JoinData - execute method full coverage", () => {
     ]);
     expect(result.allSuccess).toBe(true);
   });
+
+  it("should match a single object and map fields correctly", async () => {
+    const local = { id: 1 };
+    const from = () => [{ id: 1, name: "John" }];
+
+    const result = await joinData.execute({
+      local,
+      localField: "id",
+      fromField: "id",
+      from,
+      as: "userInfo",
+      asMap: { userName: "name" },
+    });
+
+    expect(local).toEqual({ id: 1, userInfo: { userName: "John" } });
+    expect(result.allSuccess).toBe(true);
+    expect(result.joinFailedValues).toEqual([]);
+  });
+
+  it("should match multiple objects with partial matches", async () => {
+    const local = [{ id: 1 }, { id: 2 }];
+    const from = () => [
+      { id: 1, name: "Alice" },
+      { id: 3, name: "Bob" },
+    ];
+
+    const result = await joinData.execute({
+      local,
+      localField: "id",
+      fromField: "id",
+      from,
+      as: "userInfo",
+      asMap: { userName: "name" },
+    });
+
+    expect(local).toEqual([
+      { id: 1, userInfo: { userName: "Alice" } },
+      { id: 2 },
+    ]);
+    expect(result.allSuccess).toBe(false);
+    expect(result.joinFailedValues).toEqual([2]);
+  });
+
+  it("should handle asMap as a function", async () => {
+    const local = { id: 1 };
+    const from = () => [{ id: 1, firstName: "John", lastName: "Doe" }];
+    const asMapFn = (fromValue: any) =>
+      `${fromValue.firstName} ${fromValue.lastName}`;
+
+    const result = await joinData.execute({
+      local,
+      localField: "id",
+      fromField: "id",
+      from,
+      as: "fullName",
+      asMap: asMapFn,
+    });
+
+    expect(local).toEqual({ id: 1, fullName: "John Doe" });
+    expect(result.allSuccess).toBe(true);
+  });
+
+  it("should handle asMap as a function", async () => {
+    const local = { id: 1 };
+    const from = () => [{ id: 1, firstName: "John", lastName: "Doe" }];
+    const asMapFn = (fromValue: any) =>
+      `${fromValue.firstName} ${fromValue.lastName}`;
+
+    const result = await joinData.execute({
+      local,
+      localField: "id",
+      fromField: "id",
+      from,
+      as: "fullName",
+      asMap: asMapFn,
+    });
+
+    expect(local).toEqual({ id: 1, fullName: "John Doe" });
+    expect(result.allSuccess).toBe(true);
+  });
+
+  it("should throw an error if as is not defined for array fields", async () => {
+    const local = { id: 1, items: [1, 2] };
+    const from = () => [
+      { id: 1, name: "Item 1" },
+      { id: 2, name: "Item 2" },
+    ];
+
+    await expect(
+      joinData.execute({
+        local,
+        localField: "items",
+        fromField: "id",
+        from,
+        as: undefined,
+        asMap: { itemName: "name" },
+      })
+    ).rejects.toThrow("Not found as when local value is array");
+  });
+
+  it("should handle no matches when from returns an empty array", async () => {
+    const local = [{ id: 1 }, { id: 2 }];
+    const from = () => [];
+
+    const result = await joinData.execute({
+      local,
+      localField: "id",
+      fromField: "id",
+      from,
+      as: "userInfo",
+      asMap: { userName: "name" },
+    });
+
+    expect(local).toEqual([{ id: 1 }, { id: 2 }]);
+    expect(result.allSuccess).toBe(false);
+    expect(result.joinFailedValues).toEqual([1, 2]);
+  });
+
+  it("should map values using asMap object", async () => {
+    const local = { id: 1 };
+    const from = () => [{ id: 1, details: { name: "Alice", age: 25 } }];
+
+    const result = await joinData.execute({
+      local,
+      localField: "id",
+      fromField: "id",
+      from,
+      as: "userInfo",
+      asMap: { userName: "details.name", userAge: "details.age" },
+    });
+
+    expect(local).toEqual({
+      id: 1,
+      userInfo: { userName: "Alice", userAge: 25 },
+    });
+    expect(result.allSuccess).toBe(true);
+  });
 });

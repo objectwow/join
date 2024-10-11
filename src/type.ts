@@ -1,10 +1,18 @@
 export type Primitive = string | number | boolean;
 
+export type LocalValue = any | any[];
+
 export type LocalParam = object | object[];
 
-export type FromParam = (...args: any[]) => any;
+export type FromParam =
+  | ((localFieldValues: Primitive[], metadata: any) => any)
+  | object
+  | object[];
 
-export type AsMap = { [key: string]: string };
+export type AsMap =
+  | ((fromValue: any, metadata: any) => any)
+  | { [key: string]: string }
+  | string;
 
 export interface JoinDataParam {
   /**
@@ -43,8 +51,9 @@ export type JoinDataResult =
   | any;
 
 export interface GenerateAsValueParam {
-  localValue: Primitive;
+  localValue: LocalValue;
   fromFieldMap: Map<any, object>;
+  as: string;
   asMap: AsMap;
   joinFailedValues: Primitive[];
   metadata?: any;
@@ -53,7 +62,7 @@ export interface GenerateAsValueParam {
 export interface HandleLocalObjParam {
   local: object;
   localField: string;
-  fromArr: object[];
+  fromFieldMap: Map<any, object>;
   fromField: string;
   as: string;
   asMap: AsMap;
