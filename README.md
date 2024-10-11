@@ -123,7 +123,7 @@ export class YourJoin extends JoinData {
   protected parseFieldPath(fieldPath: string): { path: string; newPath: string; } {}
   // Use case: Shadow clone local data without overwriting the original.
   protected standardizeLocalParam(local: LocalParam, metadata?: any): Promise<LocalParam> {}
-  // Use case: Auto call internal/external service to get data depends on input
+  // Use case: Automatically call internal or external services to retrieve data based on the input
   protected standardizeFromParam(from: FromParam, metadata?: any): Promise<any[]> {}
   // Use case: Throw an error if the field is invalid
   protected validateFields(arr: { key: string; value: any; }[], metadata?: any): void {}
@@ -158,9 +158,13 @@ const joinCls = new YourJoin()
 await joinCls.execute({...})
 ```
 
-Tips: You can call original function (parent function) with `super.`
+Tips:
+
+- You can call original function (parent function) with `super.`
+- You can pass anything to the metadata
 
 ## Benchmark
 
-node lib/benchmark.js
-JoinData Execution x 2,157,575 ops/sec ±2.30% (87 runs sampled)
+- Execute: `node lib/benchmark.js`
+- Report: JoinData Execution x 2,289,754 ops/sec ±3.38% (86 runs sampled)
+- Device: MacbookPro M1, 16 GB RAM, 12 CPU
