@@ -4,19 +4,19 @@ Join objects with functionality similar to MongoDB’s $lookup
 
 ⭐️ Your star shines on us. Star us on GitHub!
 
-## Use case
+# Use case
 
 - In a microservices system where each service owns its own database, querying data requires calling multiple services to retrieve the necessary information and manually joining the data. This package simplifies the process of joining data.
 
 - Imagine you have an array of `orders`. Each order contains `fulfillments`, and each `fulfillment` has a list of `products`. However, in the `product` data, you’re only storing the `productId` and `quantity`. The task is to enrich this data by retrieving the `full product details` for each `product`.
 
-## Installation
+# Installation
 
 ```
 npm i @objectwow/join
 ```
 
-## Usage
+# Usage
 
 ```typescript
 import { joinData } from "@objectwow/join";
@@ -29,37 +29,12 @@ const orders = [
       {
         id: 11,
         code: "11",
-        products: [
-          { id: 111, quantity: 1 },
-          { id: 112, quantity: 4 },
-        ],
+        products: [{ id: 111, quantity: 1 }, { id: 112, quantity: 4 }],
       },
       {
         id: 12,
         code: "12",
         products: [{ id: 111, quantity: 8 }],
-      },
-    ],
-  },
-  {
-    id: 2,
-    code: "2",
-    fulfillments: [
-      {
-        id: 21,
-        code: "21",
-        products: [
-          { id: 111, quantity: 9 },
-          { id: 112, quantity: 7 },
-        ],
-      },
-      {
-        id: 22,
-        code: "22",
-        products: [
-          { id: 111, quantity: 2 },
-          { id: 112, quantity: 3 },
-        ],
       },
     ],
   },
@@ -77,11 +52,11 @@ const result = await joinData({
   localField: "fulfillments.products.id",
   fromField: "id",
   as: "fulfillments.products",
-  asMap: { id: "id", name: "name", price: "price" },
+  asMap: { name: "name", price: "price" },
 });
 ```
 
-LocalData (orders) will be overwritten
+LocalData (orders) will be overwritten. Order products will have the `name` and `price` fields.
 
 ```typescript
 orders = [
@@ -101,28 +76,6 @@ orders = [
         id: 12,
         code: "12",
         products: [{ id: 111, name: "Product 1", price: 10, quantity: 8 }],
-      },
-    ],
-  },
-  {
-    id: 2,
-    code: "2",
-    fulfillments: [
-      {
-        id: 21,
-        code: "21",
-        products: [
-          { id: 111, name: "Product 1", price: 10, quantity: 9 },
-          { id: 112, name: "Product 2", price: 20, quantity: 7 },
-        ],
-      },
-      {
-        id: 22,
-        code: "22",
-        products: [
-          { id: 111, name: "Product 1", price: 10, quantity: 2 },
-          { id: 112, name: "Product 2", price: 20, quantity: 3 },
-        ],
       },
     ],
   },
@@ -183,7 +136,7 @@ export type AsMap =
   | string;
 ```
 
-## Test
+# Test
 
 `npm run test` or `npm run test:cov`
 
@@ -194,7 +147,7 @@ export type AsMap =
 | singleton.ts | 100     | 100      | 75      | 100     |                                      |
 | util.ts      | 100     | 89.47    | 100     | 100     | 23-24                                |
 
-## Customization
+# Customization
 
 With an out-of-the-box design, you can create your own function using the current structure.
 
@@ -272,7 +225,7 @@ Tips:
 - You can call original function (parent function) with `super.
 - You can pass anything to the metadata
 
-## Benchmark
+# Benchmark
 
 - Source:
 
@@ -306,7 +259,11 @@ const fromData = Array.from({ length: 100 }, (_, i) => ({
 - Report: JoinData Execution x 125,972 ops/sec ±1.27% (66 runs sampled)
 - Device: Macbook Pro M1 Pro, 16 GB RAM, 12 CPU
 
-## Contributors
+# Contributors
+
+<a href="https://github.com/objectwow/join/graphs/contributors"><img src="https://opencollective.com/objectwow-join/contributors.svg?width=882&button=false" /></a>
+
+# Contact
 
 If you have any questions, feel free to open an [`open an issue on GitHub`](https://github.com/objectwow/join/issues) or connect with me on [`Linkedin`](https://www.linkedin.com/in/vtuanjs/).
 
