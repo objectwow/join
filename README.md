@@ -157,7 +157,7 @@ The join method in `@objectwow/join` offers better performance compared to the j
 3. Combines the data efficiently after retrieving it in bulk through a `single call`.
 4. This results in a time complexity of O(n), where `n` is the number of elements in the original array.
 
-By fetching related data in bulk and leveraging efficient JavaScript data structures, objectwow/join minimizes redundant calls and improves overall performance.
+By fetching related data in bulk and leveraging efficient JavaScript data structures, `@objectwow/join` minimizes redundant calls and improves overall performance.
 
 ### Tradeoff
 
