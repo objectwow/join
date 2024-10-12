@@ -1,10 +1,10 @@
 # @objectwow/join
 
-Join object to object like MongoDB
+Join objects with functionality similar to MongoDB’s $lookup
 
 ## Use case
 
-In a microservices system where each service owns its own database, querying data requires calling multiple services to retrieve the necessary information and manually joining the data. This package simplifies the process of joining data, similar to how MongoDB handles it.
+In a microservices system where each service owns its own database, querying data requires calling multiple services to retrieve the necessary information and manually joining the data. This package simplifies the process of joining data, similar to how MongoDB $lookup handles it.
 
 ## Installation
 
