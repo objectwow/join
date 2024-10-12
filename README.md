@@ -26,25 +26,14 @@ const orders = [
         id: 11,
         code: "11",
         products: [
-          {
-            id: 111,
-            quantity: 1,
-          },
-          {
-            id: 112,
-            quantity: 4,
-          },
+          { id: 111, quantity: 1 },
+          { id: 112, quantity: 4 },
         ],
       },
       {
         id: 12,
         code: "12",
-        products: [
-          {
-            id: 111,
-            quantity: 8,
-          },
-        ],
+        products: [{ id: 111, quantity: 8 }],
       },
     ],
   },
@@ -56,70 +45,42 @@ const orders = [
         id: 21,
         code: "21",
         products: [
-          {
-            id: 111,
-            quantity: 9,
-          },
-          {
-            id: 112,
-            quantity: 7,
-          },
+          { id: 111, quantity: 9 },
+          { id: 112, quantity: 7 },
         ],
       },
       {
         id: 22,
         code: "22",
         products: [
-          {
-            id: 111,
-            quantity: 2,
-          },
-          {
-            id: 112,
-            quantity: 3,
-          },
+          { id: 111, quantity: 2 },
+          { id: 112, quantity: 3 },
         ],
       },
     ],
   },
 ];
 
-const products = () => [
-  {
-    id: 111,
-    name: "Product 1",
-    price: 10,
-  },
-  {
-    id: 112,
-    name: "Product 2",
-    price: 20,
-  },
-  {
-    id: 113,
-    name: "Product 3",
-    price: 30,
-  },
+const products = [
+  { id: 111, name: "Product 1", price: 10 },
+  { id: 112, name: "Product 2", price: 20 },
+  { id: 113, name: "Product 3", price: 30 },
 ];
 
 const result = await joinData({
   local: orders,
-  from: () => products,
+  from: products,
   localField: "fulfillments.products.id",
   fromField: "id",
   as: "fulfillments.products",
-  asMap: {
-    id: "id",
-    name: "name",
-    price: "price",
-  },
+  asMap: { id: "id", name: "name", price: "price" },
 });
 ```
 
-LocalData will be overwritten
+LocalData (orders) will be overwritten
 
 ```typescript
-local = [
+orders = [
   {
     id: 1,
     code: "1",
