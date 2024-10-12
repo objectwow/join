@@ -1,8 +1,8 @@
 {
   "name": "@objectwow/join",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "license": "MIT",
-  "description": "Join objects with functionality similar to MongoDB’s $lookup",
+  "description": "Join objects with functionality similar to MongoDB's $lookup",
   "publishConfig": {
     "access": "public"
   },

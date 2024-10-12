@@ -4,7 +4,9 @@ Join objects with functionality similar to MongoDB’s $lookup
 
 ## Use case
 
-In a microservices system where each service owns its own database, querying data requires calling multiple services to retrieve the necessary information and manually joining the data. This package simplifies the process of joining data, similar to how MongoDB $lookup handles it.
+- In a microservices system where each service owns its own database, querying data requires calling multiple services to retrieve the necessary information and manually joining the data. This package simplifies the process of joining data.
+
+- Imagine you have an array of `orders`. Each order contains `fulfillments`, and each `fulfillment` has a list of `products`. However, in the `product` data, you’re only storing the `productId` and `quantity`. The task is to enrich this data by retrieving the `full product details` for each `product`.
 
 ## Installation
 
