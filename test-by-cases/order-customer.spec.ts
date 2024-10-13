@@ -62,7 +62,7 @@ describe("JoinData - Sample test case for joining customer details into orders",
     expect(result.joinFailedValues).toEqual([]);
   });
 
-  it.only("should join customer details into the orders without asMap", async () => {
+  it("should join customer details into the orders without asMap", async () => {
     const orders = [
       {
         id: 1,
