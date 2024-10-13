@@ -69,7 +69,7 @@ describe("JoinData - execute method full coverage", () => {
     ];
 
     const param: JoinDataParam = {
-      from: fromFn,
+      from: await fromFn(),
       local: [{ id: 1 }, { id: 2 }],
       localField: "id",
       fromField: "id",
@@ -98,7 +98,7 @@ describe("JoinData - execute method full coverage", () => {
     ];
 
     const param: JoinDataParam = {
-      from: fromFn,
+      from: await fromFn(),
       local: [{ id: 1 }, { id: 2 }],
       localField: "id",
       fromField: "id",
@@ -164,7 +164,7 @@ describe("JoinData - execute method full coverage", () => {
       { id: 2, items: [101, 201] },
     ];
 
-    const from = async () => [
+    const from = () => [
       { id: 101, product: "Product 101" },
       { id: 102, product: "Product 102" },
       { id: 201, product: "Product 201" },
