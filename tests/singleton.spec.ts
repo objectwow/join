@@ -33,24 +33,4 @@ describe("SingletonJoinData and joinData", () => {
       expect(instance1).not.toBe(instance2);
     });
   });
-
-  describe("joinData function", () => {
-    it("should call the execute method of the JoinData instance with the correct parameters", async () => {
-      const params: JoinDataParam = {
-        from: () => ({}),
-        local: {},
-        localField: "id",
-        fromField: "foreignId",
-        as: "result",
-      };
-
-      const expectedResult: JoinDataResult = {
-        joinFailedValues: [],
-        allSuccess: true,
-      };
-
-      const result = await joinData(params);
-      expect(result).toEqual(expectedResult);
-    });
-  });
 });

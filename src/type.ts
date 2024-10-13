@@ -5,8 +5,7 @@ export type LocalValue = any | any[];
 export type LocalParam = object | object[];
 
 export type FromParam =
-  | ((localFieldValues: Primitive[], metadata: any) => any)
-  | object
+  | ((localFieldValues: Primitive[], metadata: any) => object[])
   | object[];
 
 export type AsMap =
@@ -24,7 +23,7 @@ export interface JoinDataParam {
   local: LocalParam;
 
   /**
-   * Object(s) or an asynchronous callback function that returns the data from the source.
+   * Objects or an asynchronous callback function that returns the data from the source.
    */
   from: FromParam;
 

@@ -244,18 +244,22 @@ export class JoinData {
     metadata?: any
   ): Promise<any[]> {
     if (typeOf(from) === Types.Object) {
-      return [from];
+      throw new Error("from must be an array of objects");
     }
 
     if (typeOf(from) === Types.Array) {
-      return from as any[];
+      return from as object[];
     }
 
-    const result = await (from as Function)(localFieldValues, metadata);
-    const fromArr =
-      typeOf(result) === Types.Array ? (result as object[]) : [result];
+    if (typeOf(from) === Types.Function) {
+      const result = await (from as Function)(localFieldValues, metadata);
 
-    return fromArr;
+      if (typeOf(result) === Types.Array) {
+        return result as object[];
+      }
+    }
+
+    throw new Error("from must be an array of objects");
   }
 
   protected generateResult(
