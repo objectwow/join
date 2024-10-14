@@ -4,6 +4,7 @@ import { JoinDataParam, JoinDataResult } from "./type";
 export class SingletonJoinData {
   static instance: JoinData;
 
+  /* istanbul ignore next */
   protected constructor() {}
 
   static getInstance() {
