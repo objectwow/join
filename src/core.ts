@@ -25,7 +25,7 @@ export class JoinData {
     const [first, ...remain] = fieldPath.split(this.separateSymbol);
     return {
       path: first,
-      newPath: remain?.join(this.separateSymbol),
+      newPath: remain.join(this.separateSymbol),
     };
   }
 
@@ -63,16 +63,7 @@ export class JoinData {
 
     const fromValue = fromFieldMap.get(localValue);
     if (fromValue === undefined) {
-      if (
-        typeOf(localValue) === Types.Array ||
-        typeOf(localValue) === Types.Object
-      ) {
-        // joinFailedValues.push(...localValue);
-        // skip
-      } else {
-        joinFailedValues.push(localValue);
-      }
-
+      joinFailedValues.push(localValue);
       return undefined;
     }
 

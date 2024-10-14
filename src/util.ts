@@ -21,7 +21,7 @@ export function isNullOrUndefined(value: any) {
 
 export function isEmptyObject(obj: any | any[]) {
   if (!obj) return true;
-  if (typeOf(obj) === Types.Array && !obj?.length) return true;
-  if (typeOf(obj) === Types.Object && !Object.values(obj)?.length) return true;
+  if (typeOf(obj) === Types.Array && !obj.length) return true;
+  if (typeOf(obj) === Types.Object && !Object.values(obj).length) return true;
   return false;
 }
