@@ -1,3 +1,4 @@
+import { JoinError } from "./error";
 import {
   FromParam,
   GenerateAsValueParam,
@@ -15,7 +16,7 @@ export class JoinData {
   protected validateFields(arr: { key: string; value: any }[], metadata?: any) {
     for (const item of arr) {
       if (!item.value) {
-        throw new Error(`Missing ${item.key} value`);
+        throw new JoinError(`Missing ${item.key} value`);
       }
     }
   }
@@ -38,10 +39,6 @@ export class JoinData {
     }
 
     if (typeOf(local) === Types.Object) {
-      if (!path) {
-        return local;
-      }
-
       const parsePath = this.parseFieldPath(path);
       if (!parsePath.newPath) {
         return local[parsePath.path];
@@ -50,7 +47,7 @@ export class JoinData {
       return this.getFieldValue(local[parsePath.path], parsePath.newPath);
     }
 
-    return local;
+    throw new JoinError("local type not supported");
   }
 
   private async generateAsValue(param: GenerateAsValueParam) {
@@ -94,9 +91,13 @@ export class JoinData {
             result[key] = fromFieldValue;
           }
         });
-      } else {
-        // function
+      } else if (
+        typeOf(asMap) === Types.Function ||
+        typeOf(asMap) === Types.AsyncFunction
+      ) {
         result = await (asMap as Function)(fromValue, local, metadata);
+      } else {
+        throw new JoinError("asMap type not supported");
       }
     } else {
       result = fromValue;
@@ -130,7 +131,7 @@ export class JoinData {
 
     if (typeOf(localValue) === Types.Array) {
       if (!as) {
-        throw new Error("Not found as when local value is array");
+        throw new JoinError("Not found as when local value is array");
       }
 
       const parseAsField = this.parseFieldPath(as);
@@ -138,8 +139,8 @@ export class JoinData {
         const parseLocalField = this.parseFieldPath(localField);
 
         if (parseLocalField.path !== parseAsField.path) {
-          throw new Error(
-            `First path of localField and as not matching, ${parseLocalField.path} !== ${parseAsField.path}`
+          throw new JoinError(
+            `When local[${parseAsField.path}] is an array, first path of 'localField' and 'as' need matching, ${parseLocalField.path} !== ${parseAsField.path}`
           );
         }
 
@@ -160,7 +161,7 @@ export class JoinData {
       }
 
       if (typeOf(local[as]) === Types.Object) {
-        throw new Error(
+        throw new JoinError(
           `Field ${as} existed but is object. It must be an array when local value is array`
         );
       }
@@ -183,11 +184,19 @@ export class JoinData {
 
         local[parseAsField.path].push(asValue);
       }
+      return;
     }
 
     // Not array
     if (as) {
       const parseAsField = this.parseFieldPath(as);
+
+      if (typeOf(local[parseAsField.path]) === Types.Array) {
+        throw new JoinError(
+          `Field ${as} existed but is array. It must be an object when local value is object`
+        );
+      }
+
       const asValue = await this.generateAsValue({
         local,
         localValue,
@@ -200,12 +209,6 @@ export class JoinData {
 
       if (!asValue) {
         return;
-      }
-
-      if (typeOf(local[parseAsField.path]) === Types.Array) {
-        throw new Error(
-          `Field ${as} existed but is array. It must be an object when local value is object`
-        );
       }
 
       if (typeOf(local[parseAsField.path]) === Types.Object) {
@@ -243,15 +246,14 @@ export class JoinData {
     localFieldValues: string[],
     metadata?: any
   ): Promise<any[]> {
-    if (typeOf(from) === Types.Object) {
-      throw new Error("from must be an array of objects");
-    }
-
     if (typeOf(from) === Types.Array) {
       return from as object[];
     }
 
-    if (typeOf(from) === Types.Function) {
+    if (
+      typeOf(from) === Types.Function ||
+      typeOf(from) === Types.AsyncFunction
+    ) {
       const result = await (from as Function)(localFieldValues, metadata);
 
       if (typeOf(result) === Types.Array) {
@@ -259,7 +261,7 @@ export class JoinData {
       }
     }
 
-    throw new Error("from must be an array of objects");
+    throw new JoinError("from must be an array of objects");
   }
 
   protected generateResult(
@@ -281,6 +283,10 @@ export class JoinData {
     const { from, localField, fromField, as, asMap } = param;
     let { local } = param;
     const joinFailedValues: Primitive[] = [];
+
+    if (as && as === localField) {
+      throw new JoinError("as and localField cannot be the same");
+    }
 
     this.validateFields(
       [
