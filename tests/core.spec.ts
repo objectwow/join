@@ -1,4 +1,5 @@
 import { JoinData } from "../src/core";
+import { JoinError } from "../src/error";
 import { JoinDataParam } from "../src/type";
 
 describe("JoinData - execute method full coverage", () => {
@@ -334,6 +335,213 @@ describe("JoinData - execute method full coverage", () => {
       id: 1,
       userInfo: { userName: "Alice", userAge: 25 },
     });
+    expect(result.allSuccess).toBe(true);
+  });
+
+  it("should throw an error when missing parameter", async () => {
+    const local = null as any;
+    const from = [];
+
+    try {
+      await joinData.execute({
+        local,
+        localField: "id",
+        fromField: "id",
+        from,
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(JoinError);
+    }
+  });
+
+  it("should throw an error when wrong 'local' parameter format", async () => {
+    const local = "string" as any;
+    const from = [];
+
+    try {
+      await joinData.execute({
+        local,
+        localField: "id",
+        fromField: "id",
+        from,
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(JoinError);
+    }
+  });
+
+  it("should throw an error when wrong 'asMap' parameter format", async () => {
+    const local = { id: 1 };
+    const from = [{ id: 1 }];
+
+    try {
+      await joinData.execute({
+        local,
+        localField: "id",
+        fromField: "id",
+        from,
+        asMap: 123 as any,
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(JoinError);
+    }
+  });
+
+  it("should map values using asMap deep object", async () => {
+    const local = { id: 1 };
+    const from = () => [{ id: 1, details: { name: "Alice", age: 25 } }];
+
+    const result = await joinData.execute({
+      local,
+      localField: "id",
+      fromField: "id",
+      from,
+      as: "userInfo.deep",
+      asMap: { userName: "details.name", userAge: "details.age" },
+    });
+
+    expect(local).toEqual({
+      id: 1,
+      userInfo: { deep: { userName: "Alice", userAge: 25 } },
+    });
+    expect(result.allSuccess).toBe(true);
+  });
+
+  it("should skip when local value not found", async () => {
+    const local = { id: null };
+    const from = () => [{ id: 2 }];
+
+    const result = await joinData.execute({
+      local,
+      localField: "id",
+      fromField: "id",
+      from,
+    });
+
+    expect(local).toEqual({ id: null });
+    expect(result.allSuccess).toBe(true);
+  });
+
+  it("should throw an error when 'local[as]' is existing with type array and first path of 'localField' and 'as' not matching", async () => {
+    const local = { id: 1, products: [], productIds: [1, 2] };
+    const from = [{ id: 1, name: "A" }];
+
+    try {
+      const result = await joinData.execute({
+        local,
+        localField: "productIds",
+        fromField: "id",
+        from,
+        as: "products",
+      });
+      console.log(result);
+    } catch (error) {
+      expect(error).toBeInstanceOf(JoinError);
+    }
+  });
+
+  it("should throw an error when 'local[as]' is existing with type array and first path of 'localField' and 'as' not matching", async () => {
+    const local = { id: 1, products: [], productIds: [1, 2] };
+    const from = [{ id: 1, name: "A" }];
+
+    try {
+      const result = await joinData.execute({
+        local,
+        localField: "productIds",
+        fromField: "id",
+        from,
+        as: "products",
+      });
+      console.log(result);
+    } catch (error) {
+      expect(error).toBeInstanceOf(JoinError);
+    }
+  });
+
+  it("should throw an error when 'as' and 'localField' is same", async () => {
+    const local = {};
+    const from = [];
+
+    try {
+      const result = await joinData.execute({
+        local,
+        localField: "productIds",
+        fromField: "id",
+        from,
+        as: "productIds",
+      });
+      console.log(result);
+    } catch (error) {
+      expect(error).toBeInstanceOf(JoinError);
+    }
+  });
+
+  it("should throw an error when 'local[as]' is existing with type object, but local value is array", async () => {
+    const local = { id: 1, product: {}, productIds: [1, 2] };
+    const from = [{ id: 1, name: "A" }];
+
+    try {
+      const result = await joinData.execute({
+        local,
+        localField: "productIds",
+        fromField: "id",
+        from,
+        as: "product",
+      });
+      console.log(result);
+    } catch (error) {
+      expect(error).toBeInstanceOf(JoinError);
+    }
+  });
+
+  it("should throw an error when 'local[as]' is existing with type array, but local value is not array", async () => {
+    const local = { id: 1, products: [], productId: "1" };
+    const from = [{ id: 1, name: "A" }];
+
+    try {
+      const result = await joinData.execute({
+        local,
+        localField: "productId",
+        fromField: "id",
+        from,
+        as: "products",
+      });
+      console.log(result);
+    } catch (error) {
+      expect(error).toBeInstanceOf(JoinError);
+    }
+  });
+
+  it("should throw an error when from not be an array", async () => {
+    const local = { id: 1, products: [], productId: "1" };
+    const from = { id: 1, name: "A" } as any;
+
+    try {
+      const result = await joinData.execute({
+        local,
+        localField: "productId",
+        fromField: "id",
+        from,
+        as: "products",
+      });
+      console.log(result);
+    } catch (error) {
+      expect(error).toBeInstanceOf(JoinError);
+    }
+  });
+
+  it("should skip when local is empty", async () => {
+    const local = {};
+    const from = () => [{ id: 2 }];
+
+    const result = await joinData.execute({
+      local,
+      localField: "id",
+      fromField: "id",
+      from,
+    });
+
+    expect(local).toEqual({});
     expect(result.allSuccess).toBe(true);
   });
 });

@@ -9,6 +9,7 @@ export enum Types {
   Boolean = "Boolean",
   RegExp = "RegExp",
   Function = "Function",
+  AsyncFunction = "AsyncFunction",
 }
 
 export const typeOf = (value: any): Types =>
