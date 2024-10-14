@@ -144,14 +144,14 @@ export type AsMap =
 
 The join method in `@objectwow/join` offers better performance compared to the join techniques used by `databases, Krakend, Hasura, and GraphQL`. Here’s why:
 
-### Traditional Approach (Database, Krakend, Hasura, GraphQL):
+## Traditional Approach (Database, Krakend, Hasura, GraphQL):
 
 1. Loop through the original array.
 2. `For each element, make a call` to the `database/internal/external service` containing the related data by its `UID` (unique identifier).
 3. Combine the data from both sources.
 4. This results in a time complexity of `O(n x m)`, where `n` is the number of elements in the original array, and `m` is the number of elements fetched from the related table or service.
 
-### @objectwow/join Approach:
+## @objectwow/join Approach:
 
 1. Provides a `callback function` where the input is `UIDs`, allowing the developer to fetch related data from the `database/internal/external service` in a `single call`.
 2. Uses JavaScript’s `new Map` to optimize the process, reducing the time complexity from O(m) to O(1), where `m` is the number of elements retrieved..
@@ -160,7 +160,7 @@ The join method in `@objectwow/join` offers better performance compared to the j
 
 By fetching related data in bulk and leveraging efficient JavaScript data structures, `@objectwow/join` minimizes redundant calls and improves overall performance.
 
-### Tradeoff
+## Tradeoff
 
 Of course, the tools/platforms mentioned above offer capabilities that `@objectwow/join` cannot provide, such as direct connection to the data source, pagination, conditional filtering, and more.
 
@@ -179,6 +179,8 @@ Of course, the tools/platforms mentioned above offer capabilities that `@objectw
 
 With an out-of-the-box design, you can create your own function using the current structure.
 
+## Customized definition
+
 ```typescript
 import { JoinData } from "@objectwow/join";
 
@@ -193,7 +195,7 @@ export class YourJoin extends JoinData {
     metadata?: any
   ) {}
 
-  // Use case: Shadow clone local data without overwriting the original.
+  // Use case:  Deep clone local data if you want to avoid overwriting the original.
   protected standardizeLocalParam(
     local: LocalParam,
     metadata?: any
@@ -214,7 +216,9 @@ export class YourJoin extends JoinData {
 }
 ```
 
-- Using solution 1: Override the default JoinData instance
+## Customized usage
+
+### Using solution 1: Override the default JoinData instance
 
 ```typescript
 SingletonJoinData.setInstance(new YourJoin())
@@ -222,7 +226,7 @@ SingletonJoinData.setInstance(new YourJoin())
 await joinData({...})
 ```
 
-- Using solution 2: create new singleton instances as needed
+### Using solution 2: Create new singleton instances as needed
 
 ```typescript
 import { SingletonJoinData } from "@objectwow/join";
@@ -241,7 +245,7 @@ export async function yourJoinDataFunction(
 await yourJoinDataFunction({...})
 ```
 
-- Using solution 3: you can directly use your new class without a singleton instance.
+### Using solution 3: You can directly use your new class without a singleton instance.
 
 ```typescript
 const joinCls = new YourJoin()
@@ -287,12 +291,31 @@ const fromData = Array.from({ length: 100 }, (_, i) => ({
 - Report: JoinData Execution x 125,972 ops/sec ±1.27% (66 runs sampled)
 - Device: Macbook Pro M1 Pro, 16 GB RAM, 12 CPU
 
-# Contributors
+# Questions
 
-<a href="https://github.com/objectwow/join/graphs/contributors"><img src="https://opencollective.com/objectwow-join/contributors.svg?width=882&button=false" /></a>
+## 1: Why is the original local object overwritten by default?
+
+Because we don’t want memory leaks when cloning large objects. With the overwrite behavior, object references will be reusable, and memory will be used efficiently. Only small temporary data is created at each step and released when it’s no longer needed
+
+If you prefer not to use this behavior, you can:
+
+### Solution 1: Deep clone your local object
+
+- const cloneLocal = JSON.parse(JSON.stringify(localObject))
+- Use cloneLocal at joinData local parameter
+
+### Solution 2: Customize the behavior, as mentioned in the [#Customize](https://github.com/objectwow/join#Customization):
+
+- Overwrite standardizeLocalParam to return JSON.parse(JSON.stringify(local))
+- Overwrite generateResult to return localOverwrite
+- Follow the next steps in the `Customized usage`
 
 # Contact
 
 If you have any questions, feel free to open an [`open an issue on GitHub`](https://github.com/objectwow/join/issues) or connect with me on [`Linkedin`](https://www.linkedin.com/in/vtuanjs/).
 
 Thank you for using and supporting the project!
+
+# Contributors
+
+<a href="https://github.com/objectwow/join/graphs/contributors"><img src="https://opencollective.com/objectwow-join/contributors.svg?width=882&button=false" /></a>
