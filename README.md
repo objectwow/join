@@ -1,8 +1,8 @@
 # @objectwow/join
 
-Join objects with functionality similar to MongoDB’s $lookup
+Perform a deep join of arrays of objects using UIDs.
 
-⭐️ Your star shines on us. Star us on GitHub!
+⭐️ Your star shines on us. Star us on [GitHub](https://github.com/objectwow/join)!
 
 # Use case
 
@@ -27,14 +27,6 @@ const orders = [
     code: "1",
     fulfillments: [
       {
-        id: 11,
-        code: "11",
-        products: [
-          { id: 111, quantity: 1 },
-          { id: 112, quantity: 4 },
-        ],
-      },
-      {
         id: 12,
         code: "12",
         products: [{ id: 111, quantity: 8 }],
@@ -46,7 +38,6 @@ const orders = [
 const products = [
   { id: 111, name: "Product 1", price: 10 },
   { id: 112, name: "Product 2", price: 20 },
-  { id: 113, name: "Product 3", price: 30 },
 ];
 
 const result = await joinData({
@@ -67,14 +58,6 @@ orders = [
     id: 1,
     code: "1",
     fulfillments: [
-      {
-        id: 11,
-        code: "11",
-        products: [
-          { id: 111, name: "Product 1", price: 10, quantity: 1 },
-          { id: 112, name: "Product 2", price: 20, quantity: 4 },
-        ],
-      },
       {
         id: 12,
         code: "12",
@@ -170,16 +153,16 @@ Of course, the tools/platforms mentioned above offer capabilities that `@objectw
 
 | File         | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s |
 | ------------ | ------- | -------- | ------- | ------- | ----------------- |
-| All files    | 100     | 100      | 100     | 100     |                   |
-| core.ts      | 100     | 100      | 100     | 100     |                   |
+| All files    | 100     | 94.11    | 95.23   | 100     |                   |
+| core.ts      | 100     | 95.83    | 100     | 100     | 28,66             |
 | error.ts     | 100     | 100      | 100     | 100     |                   |
-| singleton.ts | 100     | 100      | 100     | 100     |                   |
-| util.ts      | 100     | 100      | 100     | 100     |                   |
+| singleton.ts | 100     | 100      | 75      | 100     |                   |
+| util.ts      | 100     | 89.47    | 100     | 100     | 24-25             |
 
 Test Suites: 5 passed, 5 total  
 Tests: 64 passed, 64 total  
 Snapshots: 0 total  
-Time: 1.605 s, estimated 2 s
+Time: 1.56 s, estimated 2 s
 
 # Customization
 
