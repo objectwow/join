@@ -153,16 +153,16 @@ Of course, the tools/platforms mentioned above offer capabilities that `@objectw
 
 | File         | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s |
 | ------------ | ------- | -------- | ------- | ------- | ----------------- |
-| All files    | 100     | 94.11    | 95.23   | 100     |                   |
-| core.ts      | 100     | 95.83    | 100     | 100     | 28,66             |
+| All files    | 100     | 100      | 100     | 100     |                   |
+| core.ts      | 100     | 100      | 100     | 100     |                   |
 | error.ts     | 100     | 100      | 100     | 100     |                   |
-| singleton.ts | 100     | 100      | 75      | 100     |                   |
-| util.ts      | 100     | 89.47    | 100     | 100     | 24-25             |
+| singleton.ts | 100     | 100      | 100     | 100     |                   |
+| util.ts      | 100     | 100      | 100     | 100     |                   |
 
 Test Suites: 5 passed, 5 total  
 Tests: 64 passed, 64 total  
 Snapshots: 0 total  
-Time: 1.56 s, estimated 2 s
+Time: 1.638 s, estimated 2 s​
 
 # Customization
 

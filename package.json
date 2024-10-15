@@ -1,6 +1,6 @@
 {
   "name": "@objectwow/join",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "license": "MIT",
   "description": "Perform a deep join of arrays of objects using UIDs.",
   "publishConfig": {
