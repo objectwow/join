@@ -1,8 +1,8 @@
 {
   "name": "@objectwow/join",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "license": "MIT",
-  "description": "Join objects with functionality similar to MongoDB's $lookup",
+  "description": "Perform a deep join of arrays of objects using UIDs.",
   "publishConfig": {
     "access": "public"
   },
@@ -15,7 +15,9 @@
     "object",
     "join",
     "@objectwow/join",
-    "array"
+    "array",
+    "merge",
+    "deep"
   ],
   "author": "Nguyen Van Tuan",
   "main": "lib/index.js",
