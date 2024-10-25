@@ -6,10 +6,12 @@ export type LocalParam = object | object[];
 
 export type FromParam =
   | ((localFieldValues: Primitive[], metadata: any) => object[])
+  | ((localFieldValues: Primitive[], metadata: any) => Promise<object[]>)
   | object[];
 
 export type AsMap =
   | ((currentFrom: any, currentLocal: any, metadata: any) => any)
+  | ((currentFrom: any, currentLocal: any, metadata: any) => Promise<any>)
   | { [key: string]: string }
   | string;
 

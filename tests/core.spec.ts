@@ -64,13 +64,15 @@ describe("JoinData - execute method full coverage", () => {
   });
 
   it("should merge entire from objects into each local array element when as and asMap are undefined", async () => {
-    const fromFn = async () => [
-      { id: 1, name: "Alice", age: 25 },
-      { id: 2, name: "Bob", age: 30 },
-    ];
-
     const param: JoinDataParam = {
-      from: await fromFn(),
+      from: async () => {
+        const result = [
+          { id: 1, name: "Alice", age: 25 },
+          { id: 2, name: "Bob", age: 30 },
+        ] as unknown as Promise<object[]>;
+
+        return result;
+      },
       local: [{ id: 1 }, { id: 2 }],
       localField: "id",
       fromField: "id",
