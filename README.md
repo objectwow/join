@@ -160,6 +160,8 @@ result = {
 
 Note: see more samples in the [`tests`](https://github.com/objectwow/join/blob/main/tests/core.spec.ts) and [`test-by-cases`](https://github.com/objectwow/join/blob/main/test-by-cases)
 
+# Parameters
+
 ```typescript
 /**
  * Parameters for the `joinData` function to perform joins between local data and source data.
