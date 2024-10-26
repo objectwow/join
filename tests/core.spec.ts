@@ -299,7 +299,7 @@ describe("JoinData - execute method full coverage", () => {
         as: undefined,
         asMap: { itemName: "name" },
       })
-    ).rejects.toThrow("Not found as when local value is array");
+    ).rejects.toBeInstanceOf(JoinError);
   });
 
   it("should handle no matches when from returns an empty array", async () => {

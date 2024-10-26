@@ -47,7 +47,9 @@ export class JoinData {
       return this.getFieldValue(local[parsePath.path], parsePath.newPath);
     }
 
-    throw new JoinError("local type not supported");
+    throw new JoinError(
+      `local "${path}": type not supported, it must be object or array of objects`
+    );
   }
 
   private async generateAsValue(param: GenerateAsValueParam) {
@@ -122,7 +124,9 @@ export class JoinData {
 
     if (typeOf(localValue) === Types.Array) {
       if (!as) {
-        throw new JoinError("Not found as when local value is array");
+        throw new JoinError(
+          `Not found as when local "${localField}" value is array`
+        );
       }
 
       const parseAsField = this.parseFieldPath(as);
@@ -153,7 +157,7 @@ export class JoinData {
 
       if (typeOf(local[as]) === Types.Object) {
         throw new JoinError(
-          `Field ${as} existed but is object. It must be an array when local value is array`
+          `Field as "${as}" existed but is object. It must be an array when local value is array`
         );
       }
 
@@ -184,7 +188,7 @@ export class JoinData {
 
       if (typeOf(local[parseAsField.path]) === Types.Array) {
         throw new JoinError(
-          `Field ${as} existed but is array. It must be an object when local value is object`
+          `Field as ${as} existed but is array. It must be an object when local value is object`
         );
       }
 
@@ -276,7 +280,9 @@ export class JoinData {
     const joinFailedValues: Primitive[] = [];
 
     if (as && as === localField) {
-      throw new JoinError("as and localField cannot be the same");
+      throw new JoinError(
+        `as "${as}" and localField "${localField}" cannot be the same`
+      );
     }
 
     this.validateFields(
