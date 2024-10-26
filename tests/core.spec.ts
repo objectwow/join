@@ -546,4 +546,27 @@ describe("JoinData - execute method full coverage", () => {
     expect(local).toEqual({});
     expect(result.allSuccess).toBe(true);
   });
+
+  it("should map with asMap function", async () => {
+    const local = { id: 1, customerId: 11 };
+    const from = [{ id: 11, firstName: "John", lastName: "Doe" }];
+
+    const result = await joinData.execute({
+      local,
+      localField: "customerId",
+      fromField: "id",
+      from,
+      as: "customerName",
+      asMap: (currentFrom: any, currentLocal: any) => {
+        return `${currentFrom.firstName} ${currentFrom.lastName}`;
+      },
+    });
+
+    expect(local).toEqual({
+      id: 1,
+      customerName: "John Doe",
+      customerId: 11,
+    });
+    expect(result.allSuccess).toBe(true);
+  });
 });

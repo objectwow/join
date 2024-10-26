@@ -452,4 +452,89 @@ describe("JoinData - Sample test case for joining orders with products", () => {
     expect(orders).toEqual(expectedOrders);
     expect(result.allSuccess).toBe(true);
   });
+
+  it("should return productNameWithPrices", async () => {
+    const result = await joinData({
+      local: orders,
+      from: () => products,
+      localField: "fulfillments.products.id",
+      fromField: "id",
+      as: "productNameWithPrices",
+      asMap: async (currentFrom: any, currentLocal: any) => {
+        return `${currentFrom.name} ${currentFrom.price}`;
+      },
+    });
+
+    const expectedOrders = [
+      {
+        id: 1,
+        code: "1",
+        productNameWithPrices: ["Product 1 10", "Product 2 20"],
+        fulfillments: [
+          {
+            id: 11,
+            code: "11",
+            products: [
+              {
+                id: 111,
+                quantity: 1,
+              },
+              {
+                id: 112,
+                quantity: 4,
+              },
+            ],
+          },
+          {
+            id: 12,
+            code: "12",
+            products: [
+              {
+                id: 111,
+                quantity: 8,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 2,
+        code: "2",
+        productNameWithPrices: ["Product 1 10", "Product 2 20"],
+        fulfillments: [
+          {
+            id: 21,
+            code: "21",
+            products: [
+              {
+                id: 111,
+                quantity: 9,
+              },
+              {
+                id: 112,
+                quantity: 7,
+              },
+            ],
+          },
+          {
+            id: 22,
+            code: "22",
+            products: [
+              {
+                id: 111,
+                quantity: 2,
+              },
+              {
+                id: 112,
+                quantity: 3,
+              },
+            ],
+          },
+        ],
+      },
+    ];
+
+    expect(orders).toEqual(expectedOrders);
+    expect(result.allSuccess).toBe(true);
+  });
 });
